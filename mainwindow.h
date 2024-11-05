@@ -44,6 +44,7 @@ public:
 
     void drawPoint(const Point& point,QColor color);
     void drawAxes();
+    void printStrelka(Point p1,Point p2,QColor color);
 
 private:
     Ui::MainWindow *ui;

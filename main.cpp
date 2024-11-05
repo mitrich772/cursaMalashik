@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#define MULT 1
 using namespace std;
 
 class MathFunction {
@@ -63,18 +64,18 @@ public:
     static Point minWithConjugateGradient(const MathFunction func, Point point,double h = 1e-6, int maxIter = 1000) {
         Point grad = computeGradient(func, point); // Градиент теперь Point
         Point d = grad;
-        double beta;
+        double beta, gradNorm;
 
         swapCoords(d); // Начальное направление
 
         for (int k = 0; k < maxIter; ++k) {
             // Поиск шага
-            double alpha = 0.001;  // Пример фиксированного шага
+            double alpha = 0.0001;  // Пример фиксированного шага
             Point pointNew = point + (d * alpha);
 
             // Вычисляем новый градиент и проверяем условие остановки
             Point gradNew = computeGradient(func, pointNew);
-            double gradNorm = sqrt(gradNew.coords[0] * gradNew.coords[0] + gradNew.coords[1] * gradNew.coords[1]);
+            gradNorm = sqrt(gradNew.coords[0] * gradNew.coords[0] + gradNew.coords[1] * gradNew.coords[1]);
 
             if (gradNorm < h) {
                 return pointNew;
@@ -135,7 +136,7 @@ MathFunction conjugateGradient::secondMathFunc = MathFunction(
         if (args.size() != 2) {
             throw invalid_argument("Function requires exactly 2 arguments.");
         }
-        return (-1*((x-3)*(x-3)*(y-4)*(y-4)) + 10*((x-5)*(x-5)) + (y-4)*(y-4) + 1);
+        return (-1*(((x-3)*(x-3)*(y-4)*(y-4)) + 10*((x-5)*(x-5)) + (y-4)*(y-4) + 1));
         }
     ); // реализация 2й
 
@@ -143,16 +144,17 @@ int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
     MainWindow w;
-    conjugateGradient::minWithConjugateGradient(conjugateGradient::firstMathFunc,Point{12,24});
-    for(Point p : points){
-        w.drawPoint(p*10,Qt::blue);
+    conjugateGradient::minWithConjugateGradient(conjugateGradient::firstMathFunc,Point{-50,-50});
+    for(int i = 0;i<points.size()-1;i++){
+        w.printStrelka(points[i]*MULT,points[i+1]*MULT,Qt::blue);
     }
+    cout<<points[points.size()-1].coords[0] << "|" << points[points.size()-1].coords[1]<<endl;
     points.clear();
-    conjugateGradient::minWithConjugateGradient(conjugateGradient::secondMathFunc,Point{12,24});
-    for(Point p : points){
-        w.drawPoint(p*10,Qt::red);
+    conjugateGradient::minWithConjugateGradient(conjugateGradient::secondMathFunc,Point{5,50});
+    for(int i = 0;i<points.size()-1;i++){
+        w.printStrelka(points[i]*MULT,points[i+1]*MULT,Qt::red);
     }
-
+    cout<<points[points.size()-1].coords[0] << "|" << points[points.size()-1].coords[1]<<endl;
     w.show();
     return a.exec();
 }
