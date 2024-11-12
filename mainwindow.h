@@ -50,7 +50,7 @@ public:
     QtCharts::QLineSeries *makeSeries(vector<Point> points);
     void on_pushButtonCalculate_clicked();
     void on_pushButtonClear_clicked();
-    void calculateAll(double h_value,double initialAlpha);
+    void calculateAll(double h_value,double initialAlpha, double stepReduce);
     void clear();
 
     QtCharts::QLineSeries *series1;

@@ -13,7 +13,7 @@
 #define INIT_ALPHA 100
 #define H 1e-8
 #define TOL 1e-8
-#define ITERATIONS 1000
+#define ITERATIONS 10000
 #define N 2
 using namespace std;
 
@@ -54,9 +54,9 @@ MathFunction secondMathFunc(
     }
     );
 
-double lineSearch(const MathFunction& func, const Point& point, const Point& direction, double initialAlpha = INIT_ALPHA, double tol = 1e-6) {
+double lineSearch(const MathFunction& func, const Point& point, const Point& direction, double initialAlpha = INIT_ALPHA,double stepReduce = 0.5 ,double tol = 1e-6) {
     double alpha = initialAlpha;
-    double stepSizeReduction = 0.5;
+    double stepSizeReduction = stepReduce;
     double minAlpha = tol;
     double bestAlpha = 0.0;
     double bestValue = func.evaluate(point.coords);
@@ -105,7 +105,7 @@ double findBeta(const Point& grad, const Point& gradNew, size_t iteration) {
 }
 
 
-Point minWithConjugateGradient(const MathFunction& func, Point point, double h = H, double initialAlpha = INIT_ALPHA, int maxIter = ITERATIONS) {
+Point minWithConjugateGradient(const MathFunction& func, Point point, double h = H, double initialAlpha = INIT_ALPHA,double stepReduce = 0.5 ,int maxIter = ITERATIONS) {
     Point grad = computeGradient(func, point);
     Point d = grad * -1;
     double beta, gradNorm;
@@ -115,7 +115,7 @@ Point minWithConjugateGradient(const MathFunction& func, Point point, double h =
             std::cout << "MaxIter reached" << std::endl;
         }
 
-        double alpha = lineSearch(func, point, d, initialAlpha);
+        double alpha = lineSearch(func, point, d, initialAlpha, stepReduce);
         Point pointNew = point + (d * alpha);
 
         Point gradNew = computeGradient(func, pointNew);
@@ -143,7 +143,7 @@ QtCharts::QLineSeries* MainWindow::makeSeries(vector<Point> points = {}){
     return series;
 }
 
-void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPHA){
+void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPHA, double stepReduce = 0.5){
     QtCharts::QLineSeries *series;
 
     cout << "Starting minimization of the first function..." << endl;
@@ -151,7 +151,7 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
     Point startPoint1{-100, -10};
 
 
-    Point minPoint1 = minWithConjugateGradient(firstMathFunc, startPoint1, h_value, initialAlpha);
+    Point minPoint1 = minWithConjugateGradient(firstMathFunc, startPoint1, h_value, initialAlpha,stepReduce);
     if (!points.empty()) {
         cout << "First function minimized." << endl;
 
@@ -175,9 +175,9 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
     // Вт
     cout << "\nStarting minimization of the second function..." << endl;
     points.clear();
-    Point startPoint2{0,10};
+    Point startPoint2{-15,-5};
 
-    Point minPoint2 = minWithConjugateGradient(secondMathFunc, startPoint2, h_value, initialAlpha);
+    Point minPoint2 = minWithConjugateGradient(secondMathFunc, startPoint2, h_value, initialAlpha,stepReduce);
     if (!points.empty()) {
 
 
@@ -230,11 +230,13 @@ void MainWindow::on_pushButtonCalculate_clicked(){
     // Получаем значение из spinBoxNumber
     double h_value = ui->doubleSpinBox_h->value();
     double alpha_value = ui->doubleSpinBox_Alpha->value();
-
+    double stepReduce = ui->doubleSpinBox_AlphaRedution->value();
+    cout<<"accur:="<< h_value << endl;
+    cout<<"alpha:="<< alpha_value << endl;
     if(h_value == 0 || alpha_value == 0){
         calculateAll();
     }else{
-        calculateAll(h_value,alpha_value);
+        calculateAll(h_value,alpha_value,stepReduce);
     }
 }
 
