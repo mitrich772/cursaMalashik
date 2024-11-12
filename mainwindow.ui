@@ -6,22 +6,136 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1200</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="layoutDirection">
+   <enum>Qt::RightToLeft</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGraphicsView" name="graphicsView">
+   <widget class="QWidget" name="chartContainer" native="true">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>500</width>
-      <height>500</height>
+      <x>20</x>
+      <y>20</y>
+      <width>900</width>
+      <height>800</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_h">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>20</y>
+      <width>150</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="specialValueText">
+     <string>0,000001</string>
+    </property>
+    <property name="decimals">
+     <number>10</number>
+    </property>
+    <property name="maximum">
+     <double>10000.000000000000000</double>
+    </property>
+    <property name="stepType">
+     <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonCalculate">
+    <property name="geometry">
+     <rect>
+      <x>1070</x>
+      <y>270</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>calculate</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditHValue">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>20</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Точность h:</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_Alpha">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>60</y>
+      <width>150</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="specialValueText">
+     <string>1000</string>
+    </property>
+    <property name="decimals">
+     <number>10</number>
+    </property>
+    <property name="maximum">
+     <double>10000000000.000000000000000</double>
+    </property>
+    <property name="stepType">
+     <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditAlphaValue">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>60</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::RightToLeft</enum>
+    </property>
+    <property name="text">
+     <string>Шаг alpha:</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonClear">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>270</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>clear</string>
     </property>
    </widget>
   </widget>
@@ -30,7 +144,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1200</width>
      <height>21</height>
     </rect>
    </property>
