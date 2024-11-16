@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="layoutDirection">
-   <enum>Qt::LayoutDirection::RightToLeft</enum>
+   <enum>Qt::LeftToRight</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="chartContainer" native="true">
@@ -30,23 +30,32 @@
    <widget class="QDoubleSpinBox" name="doubleSpinBox_h">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1040</x>
       <y>20</y>
       <width>150</width>
       <height>30</height>
      </rect>
     </property>
+    <property name="wrapping">
+     <bool>false</bool>
+    </property>
     <property name="specialValueText">
      <string/>
     </property>
+    <property name="accelerated">
+     <bool>false</bool>
+    </property>
+    <property name="correctionMode">
+     <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+    </property>
     <property name="decimals">
-     <number>10</number>
+     <number>8</number>
     </property>
     <property name="maximum">
      <double>10000.000000000000000</double>
     </property>
     <property name="stepType">
-     <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+     <enum>QAbstractSpinBox::DefaultStepType</enum>
     </property>
     <property name="value">
      <double>0.000001000000000</double>
@@ -70,7 +79,7 @@
      <rect>
       <x>940</x>
       <y>20</y>
-      <width>71</width>
+      <width>91</width>
       <height>30</height>
      </rect>
     </property>
@@ -87,7 +96,7 @@
    <widget class="QDoubleSpinBox" name="doubleSpinBox_Alpha">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1040</x>
       <y>60</y>
       <width>150</width>
       <height>30</height>
@@ -97,16 +106,19 @@
      <string/>
     </property>
     <property name="decimals">
-     <number>10</number>
+     <number>2</number>
+    </property>
+    <property name="minimum">
+     <double>0.010000000000000</double>
     </property>
     <property name="maximum">
      <double>10000000000.000000000000000</double>
     </property>
     <property name="stepType">
-     <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+     <enum>QAbstractSpinBox::DefaultStepType</enum>
     </property>
     <property name="value">
-     <double>100.000000000000000</double>
+     <double>1000000.000000000000000</double>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEditAlphaValue">
@@ -114,12 +126,12 @@
      <rect>
       <x>940</x>
       <y>60</y>
-      <width>71</width>
+      <width>91</width>
       <height>30</height>
      </rect>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::RightToLeft</enum>
+     <enum>Qt::LeftToRight</enum>
     </property>
     <property name="text">
      <string>Шаг alpha:</string>
@@ -147,7 +159,7 @@
    <widget class="QDoubleSpinBox" name="doubleSpinBox_AlphaRedution">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1040</x>
       <y>100</y>
       <width>150</width>
       <height>30</height>
@@ -157,15 +169,122 @@
      <string/>
     </property>
     <property name="decimals">
-     <number>10</number>
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>0.001000000000000</double>
     </property>
     <property name="maximum">
-     <double>10000000000.000000000000000</double>
+     <double>0.990000000000000</double>
     </property>
     <property name="stepType">
-     <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+     <enum>QAbstractSpinBox::DefaultStepType</enum>
     </property>
     <property name="value">
+     <double>0.800000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditAlphaValue_2">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>100</y>
+      <width>91</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="text">
+     <string>Кооф. уменш. :</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QSlider" name="horizontalSlider">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>500</y>
+      <width>160</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-100</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="tickInterval">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QSlider" name="verticalSlider">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>340</y>
+      <width>16</width>
+      <height>160</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-100</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="tickInterval">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_X">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>410</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <double>-100.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_Y">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>410</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <double>-100.000000000000000</double>
+    </property>
+    <property name="maximum">
      <double>100.000000000000000</double>
     </property>
    </widget>
@@ -176,7 +295,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

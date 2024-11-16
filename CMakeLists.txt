@@ -34,6 +34,7 @@ else()
     else()
         add_executable(cursaMalashik
             ${PROJECT_SOURCES}
+            customwidget.h customwidget.cpp
         )
     endif()
 endif()

@@ -7,13 +7,15 @@
 #include <QtCharts/QChart>
 #include <iostream>
 #include <QVBoxLayout>
+#include<QWidget>
+#include"customwidget.h"
 #define SIZE 500
 #define MULT 2
 #define MULT2 2
 #define INIT_ALPHA 100
 #define H 1e-8
 #define TOL 1e-8
-#define ITERATIONS 10000
+#define ITERATIONS 100000
 #define N 2
 using namespace std;
 
@@ -74,6 +76,31 @@ double lineSearch(const MathFunction& func, const Point& point, const Point& dir
     }
     return bestAlpha;
 }
+double FindMin(const MathFunction& f, const Point& start, const Point& direction, double step = 0.1, double tol = 1e-4) {
+    double alpha = 0.0;
+    double bestAlpha = 0.0;
+    double fx = f.evaluate(start);
+    double bestFx = fx;
+
+    while (true) {
+        alpha += step;
+        Point x = start + direction * alpha;
+        double newFx = f.evaluate(x);
+
+        // Если новое значение меньше, обновляем лучшую точку
+        if (newFx < bestFx) {
+            bestFx = newFx;
+            bestAlpha = alpha;
+        } else {
+            // Если значение увеличивается, уменьшаем шаг и пробуем снова
+            step *= 0.5;
+            if (step < tol) break;
+            alpha -= step;  // Возвращаемся назад
+        }
+    }
+
+    return bestAlpha;
+}
 
 
 double computePartialDerivative(const MathFunction& func, const std::vector<double>& coords, unsigned int index, double h) {
@@ -122,6 +149,7 @@ Point minWithConjugateGradient(const MathFunction& func, Point point, double h =
         gradNorm = sqrt(gradNew.coords[0] * gradNew.coords[0] + gradNew.coords[1] * gradNew.coords[1]);
 
         if (gradNorm < h) {
+            cout << "Iterations:=" << k << endl;
             return pointNew;
         }
 
@@ -148,7 +176,6 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
 
     cout << "Starting minimization of the first function..." << endl;
     points.clear();
-    Point startPoint1{-100, -10};
 
 
     Point minPoint1 = minWithConjugateGradient(firstMathFunc, startPoint1, h_value, initialAlpha,stepReduce);
@@ -162,7 +189,7 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
 
 
 
-        double resultFirst = firstMathFunc.evaluate(points.back().coords);
+        double resultFirst = firstMathFunc.evaluate(minPoint1);
 
         cout << "Minimum of the first function at point ("
              << points.back().coords[0] << ", "
@@ -170,12 +197,13 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
              << resultFirst << endl;
     } else {
         cout << "Error: No points found during minimization of the first function." << endl;
+        makeSeries();
     }
     chart->createDefaultAxes();
     // Вт
     cout << "\nStarting minimization of the second function..." << endl;
     points.clear();
-    Point startPoint2{-15,-5};
+    //startPoint2{-15,-5};
 
     Point minPoint2 = minWithConjugateGradient(secondMathFunc, startPoint2, h_value, initialAlpha,stepReduce);
     if (!points.empty()) {
@@ -185,37 +213,91 @@ void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPH
         series2 = series;
         addSeriesToChart(series);
 
-        cout << initialAlpha <<endl;
         cout << "Second function minimized." << endl;
-        double resultSecond = secondMathFunc.evaluate(points.back().coords);
+        double resultSecond = secondMathFunc.evaluate(minPoint2);
         cout << "Minimum of the second function at point ("
              << points.back().coords[0] << ", "
              << points.back().coords[1] << ") := "
              << resultSecond << endl;
     } else {
         cout << "Error: No points found during minimization of the second function." << endl;
+        series2 = makeSeries();
     }
     chart->createDefaultAxes();
+    setupAxes();
 }
 
 void MainWindow::addSeriesToChart(QtCharts::QLineSeries* series){
     chart->addSeries(series);
 }
 
-void MainWindow::clear(){
-    chart->removeAllSeries();
-    chart->addSeries(makeSeries());
+void MainWindow::clear() {
+    for (auto series : chart->series()) {
+        // Преобразуем текущую серию в QLineSeries, чтобы очистить точки
+        auto lineSeries = qobject_cast<QtCharts::QLineSeries*>(series);
+        if (lineSeries) {
+            lineSeries->clear(); // Удаляем все точки из серии
+        }
+    }
+    chart->update(); // Обновляем график
 }
 
+void MainWindow::setupAxes() {
+    // Создаем оси
+
+    QtCharts::QValueAxis *axisX = new QtCharts::QValueAxis();
+    QtCharts::QValueAxis *axisY = new QtCharts::QValueAxis();
+
+    // Устанавливаем фиксированные диапазоны для осей
+    axisX->setRange(-50, 50);  // Пример: ось X от -10 до 10
+    axisY->setRange(-50, 50);  // Пример: ось Y от -10 до 10
+
+    QList<QtCharts::QAbstractAxis*> oldAxes = chart->axes();
+    for (QtCharts::QAbstractAxis* axis : oldAxes) {
+        chart->removeAxis(axis);
+    }
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    // Привязываем серии к осям
+    if (series1->count() != 0) {
+        series1->attachAxis(axisX);
+        series1->attachAxis(axisY);
+    }
+    if (series2->count() != 0) {
+        series2->attachAxis(axisX);
+        series2->attachAxis(axisY);
+    }
+}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // Создаём новый CustomWidget
+    CustomWidget *customContainer = new CustomWidget(this);
+    customContainer->setGeometry(ui->chartContainer->geometry());
+
+    // Переносим layout из старого chartContainer
+//    QLayout *layout = ui->chartContainer->layout();
+//    ui->chartContainer->setLayout(nullptr); // Отвязываем layout от старого контейнера
+//    customContainer->setLayout(layout);
+
+    // Заменяем старый chartContainer на новый
+    delete ui->chartContainer;
+    ui->chartContainer = customContainer;
+
+    // Подключаем сигнал для кликов мыши
+
+
+    h_value = ui->doubleSpinBox_h->value();
+    alpha_value = ui->doubleSpinBox_Alpha->value();
+    stepReduce = ui->doubleSpinBox_AlphaRedution->value();
+
     scene = new QGraphicsScene();
     chart = new QtCharts::QChart();
     chart->legend()->hide();
-    chart->setTitle("график");
+
 
     QtCharts::QChartView *chartView = new QtCharts::QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
@@ -223,26 +305,76 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout(ui->chartContainer);
     ui->chartContainer->setLayout(layout);
     ui->chartContainer->layout()->addWidget(chartView);
+
     connect(ui->pushButtonCalculate, &QPushButton::clicked, this, &MainWindow::on_pushButtonCalculate_clicked); //подключение кнопки
     connect(ui->pushButtonClear, &QPushButton::clicked, this, &MainWindow::on_pushButtonClear_clicked);
+    connect(ui->horizontalSlider, &QSlider::sliderMoved, this, &MainWindow::on_horizontalSlide_moved);
+    connect(ui->verticalSlider, &QSlider::sliderMoved, this, &MainWindow::on_verticalSlide_moved);
+    connect(customContainer, &CustomWidget::mouseClicked, this, &MainWindow::on_chartContainerClicked);
+
+
+}
+
+void MainWindow::on_chartContainerClicked(QPoint &pos) {
+    if(chart->axes().length() != 0){
+        MainWindow::setupAxes();
+    }
+    pos -= QPoint(71,45); //777|697
+
+    x = (pos.rx() / 7.77) - 50;
+    y = -((pos.ry() / 6.97) - 50);
+    cout<<x<<"|"<<y<<endl;
+    startPoint1 = Point{x,y};
+    startPoint2 = Point{x,y};
+
+    ui->doubleSpinBox_Y->setValue(y);
+    ui->doubleSpinBox_X->setValue(x);
+
+    clear();
+    calculateAll(h_value,alpha_value,stepReduce);
 }
 void MainWindow::on_pushButtonCalculate_clicked(){
-    // Получаем значение из spinBoxNumber
-    double h_value = ui->doubleSpinBox_h->value();
-    double alpha_value = ui->doubleSpinBox_Alpha->value();
-    double stepReduce = ui->doubleSpinBox_AlphaRedution->value();
-    cout<<"accur:="<< h_value << endl;
-    cout<<"alpha:="<< alpha_value << endl;
-    if(h_value == 0 || alpha_value == 0){
-        calculateAll();
-    }else{
-        calculateAll(h_value,alpha_value,stepReduce);
-    }
+    h_value = ui->doubleSpinBox_h->value();
+    alpha_value = ui->doubleSpinBox_Alpha->value();
+    stepReduce = ui->doubleSpinBox_AlphaRedution->value();
+    x = ui->horizontalSlider->value();
+    y = ui->verticalSlider->value();
+
+    startPoint1 = Point{x,y};
+    startPoint2 = Point{x,y};
+
+    calculateAll(h_value,alpha_value,stepReduce);
+
 }
 
 void MainWindow::on_pushButtonClear_clicked(){
     clear();
+}
+void MainWindow::on_horizontalSlide_moved(){
+    clear();
     chart->update();
+
+    x = ui->horizontalSlider->value();
+    //y = ui->verticalSlider->value();
+
+    startPoint1 = Point{x,y};
+    startPoint2 = Point{x,y};
+
+    ui->doubleSpinBox_X->setValue(x);
+    calculateAll(h_value,alpha_value,stepReduce);
+}
+void MainWindow::on_verticalSlide_moved(){
+    clear();
+    chart->update();
+
+    //x = ui->horizontalSlider->value();
+    y = ui->verticalSlider->value();
+
+    startPoint1 = Point{x,y};
+    startPoint2 = Point{x,y};
+
+    ui->doubleSpinBox_Y->setValue(y);
+    calculateAll(h_value,alpha_value,stepReduce);
 }
 
 MainWindow::~MainWindow()
