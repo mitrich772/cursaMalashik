@@ -1,0 +1,40 @@
+Result: (3, 5):= 9.23939e-14
+Iterations: 31
+Result: (5, 4):= -1
+Iterations: 11
+Result: (3, 5):= 9.05141e-14
+Iterations: 35
+Result: (5, 4):= -1
+Iterations: 17
+Result: (3, 5):= 8.61192e-14
+Iterations: 34
+Result: (5, 4):= -1
+Iterations: 18
+Result: (3, 5):= 1.5526e-13
+Iterations: 32
+Result: (5, 4):= -1
+Iterations: 20
+Result: (3, 5):= 8.49596e-15
+Iterations: 46
+Result: (5, 4):= -1
+Iterations: 23
+Result: (3, 5):= 4.4421e-14
+Iterations: 25
+Result: (5, 4):= -1
+Iterations: 20
+Result: (3, 5):= 5.21992e-15
+Iterations: 32
+Result: (5, 4):= -1
+Iterations: 14
+Result: (3, 5):= 6.06241e-14
+Iterations: 31
+Result: (5, 4):= -1
+Iterations: 16
+Result: (3, 5):= 5.56659e-15
+Iterations: 40
+Result: (5, 4):= -1
+Iterations: 23
+Result: (3, 5):= 9.05141e-14
+Iterations: 35
+Result: (5, 4):= -1
+Iterations: 17

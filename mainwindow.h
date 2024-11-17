@@ -8,10 +8,16 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
 #include <QtCharts/QValueAxis>
+#include <QDebug>
+#include <QVBoxLayout>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
+#include <QDir>
+#include<QString>
 
 
 using namespace std;
-
 struct Point {
     vector<double> coords;
 
@@ -32,6 +38,20 @@ struct Point {
             val *= scalar;
         }
         return result;
+    }
+};
+class MathFunction {
+public:
+
+    function<double(const vector<double>&)> func;
+
+    MathFunction(function<double(const vector<double>&)> f) : func(f){}
+
+    double evaluate(const vector<double> args) const {
+        return func(args);
+    }
+    double evaluate(const Point args) const {
+        return func(args.coords);
     }
 };
 
@@ -56,6 +76,10 @@ public:
     void calculateAll(double h_value,double initialAlpha, double stepReduce);
     void clear();
     void setupAxes();
+    Point minWithConjugateGradient(const MathFunction& func, Point point, double h , double initialAlpha,double stepReduce ,int maxIter);
+    void saveResultsToFile(const QString& fileName, const Point& result, MathFunction func, int iterations);
+    void createFile(const QString &fileName);
+    void clearFile(const QString &filePath);
 
     QtCharts::QLineSeries *series1;
     QtCharts::QLineSeries *series2;

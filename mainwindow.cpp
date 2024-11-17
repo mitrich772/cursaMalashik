@@ -19,20 +19,6 @@
 #define N 2
 using namespace std;
 
-class MathFunction {
-public:
-
-    function<double(const vector<double>&)> func;
-
-    MathFunction(function<double(const vector<double>&)> f) : func(f){}
-
-    double evaluate(const vector<double> args) const {
-        return func(args);
-    }
-    double evaluate(const Point args) const {
-        return func(args.coords);
-    }
-};
 
 static vector<Point> points;
 
@@ -55,6 +41,51 @@ MathFunction secondMathFunc(
         return (-1.0 / ((x - 3) * (x - 3) * (y - 4) * (y - 4) + 10 * (x - 5) * (x - 5) + (y - 4) * (y - 4) + 1));
     }
     );
+void MainWindow::saveResultsToFile(const QString& fileName, const Point& result, MathFunction func, int iterations) {
+    QString path = "C:/Users/dima/Documents/cursaMalashik/" + fileName; // Путь к файлу
+    QFile file(path);
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << "Result: (" << result.coords[0] << ", " << result.coords[1] << ")" << ":= "<< func.evaluate(result) << "\n";
+        out << "Iterations: " << iterations << "\n";
+        file.close();
+        qDebug() << "Результаты успешно сохранены в файл:" << path;
+    } else {
+        qDebug() << "Ошибка при открытии файла:" << path;
+    }
+}
+
+// Функция создания файла
+void MainWindow::createFile(const QString &fileName) {
+    QString directory = "C:/Users/dima/Documents/cursaMalashik/";
+    QDir dir(directory);
+
+    // Создаем папку, если она не существует
+    if (!dir.exists()) {
+        dir.mkpath(directory);
+    }
+
+    QFile file(dir.filePath(fileName));
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        file.close();
+        qDebug() << "Файл создан: " << dir.filePath(fileName);
+    } else {
+        qDebug() << "Ошибка при создании файла: " << file.errorString();
+    }
+}
+void MainWindow::clearFile(const QString &filePath) {
+    QFile file(filePath);
+
+    // Открываем файл в режиме записи (WriteOnly), чтобы очистить его содержимое
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.resize(0); // Убедимся, что файл действительно очищен
+        file.close();
+        qDebug() << "Файл успешно очищен:" << filePath;
+    } else {
+        qDebug() << "Не удалось открыть файл для очистки:" << file.errorString();
+    }
+}
 
 double lineSearch(const MathFunction& func, const Point& point, const Point& direction, double initialAlpha = INIT_ALPHA,double stepReduce = 0.5 ,double tol = 1e-6) {
     double alpha = initialAlpha;
@@ -132,7 +163,7 @@ double findBeta(const Point& grad, const Point& gradNew, size_t iteration) {
 }
 
 
-Point minWithConjugateGradient(const MathFunction& func, Point point, double h = H, double initialAlpha = INIT_ALPHA,double stepReduce = 0.5 ,int maxIter = ITERATIONS) {
+Point MainWindow::minWithConjugateGradient(const MathFunction& func, Point point, double h = H, double initialAlpha = INIT_ALPHA,double stepReduce = 0.5 ,int maxIter = ITERATIONS) {
     Point grad = computeGradient(func, point);
     Point d = grad * -1;
     double beta, gradNorm;
@@ -150,6 +181,8 @@ Point minWithConjugateGradient(const MathFunction& func, Point point, double h =
 
         if (gradNorm < h) {
             cout << "Iterations:=" << k << endl;
+            //clearFile("result.txt");
+            saveResultsToFile("result.txt", pointNew, func, k);
             return pointNew;
         }
 
@@ -171,9 +204,9 @@ QtCharts::QLineSeries* MainWindow::makeSeries(vector<Point> points = {}){
     return series;
 }
 
-void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPHA, double stepReduce = 0.5){
+void MainWindow::calculateAll(double h_value = H,double initialAlpha = INIT_ALPHA, double stepReduce = 0.5){ // Дальше бога нет
     QtCharts::QLineSeries *series;
-
+    clearFile("result.txt");
     cout << "Starting minimization of the first function..." << endl;
     points.clear();
 
@@ -274,6 +307,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    createFile("result.txt");
     // Создаём новый CustomWidget
     CustomWidget *customContainer = new CustomWidget(this);
     customContainer->setGeometry(ui->chartContainer->geometry());
